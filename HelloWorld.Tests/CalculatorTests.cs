@@ -1,10 +1,10 @@
 ﻿using System;
 using Xunit;
-using static Calculator;      // если Calculator без namespace, иначе используйте полное имя
+using static Calculator;   // Calculator находится в глобальном пространстве имён
 
 public class CalculatorTests
 {
-    // базовые операции
+    // ---------- базовые операции ----------
     [Theory]
     [InlineData(2, 3, '+', 5)]
     [InlineData(10, 4, '-', 6)]
@@ -18,17 +18,17 @@ public class CalculatorTests
         Assert.Equal(expected, actual);
     }
 
-    // деление на ноль
+    // ---------- деление на ноль ----------
     [Fact]
     public void Compute_DivideByZero_Throws()
         => Assert.Throws<DivideByZeroException>(() => Compute(5, 0, '/'));
 
-    // неизвестный оператор
+    // ---------- неизвестный оператор ----------
     [Fact]
     public void Compute_UnsupportedOperator_Throws()
         => Assert.Throws<ArgumentException>(() => Compute(1, 2, '#'));
 
-    // парсинг научной нотации
+    // ---------- парсинг научной нотации ----------
     [Theory]
     [InlineData("1.23e4", 12300)]
     [InlineData("-4.5E-2", -0.045)]
@@ -39,19 +39,19 @@ public class CalculatorTests
         Assert.Equal(expected, actual);
     }
 
-    // оценка выражения слева‑направо
+    // ---------- оценка выражения слева‑направо ----------
     [Theory]
-    [InlineData("2 + 3 * 4", 20)]          // (2+3)*4 = 20
+    [InlineData("2 + 3 * 4", 20)]          // (2+3)*4 = 20 (left‑to‑right)
     [InlineData("5 - 2 ^ 2", 9)]          // (5-2)^2 = 9
     [InlineData("10 / 2 * 3", 15)]        // (10/2)*3 = 15
-    [InlineData("1 + 2 + 3 + 4", 10)]     // цепочка сложения
+    [InlineData("1 + 2 + 3 + 4", 10)]     // 1+2+3+4 = 10
     public void EvaluateExpression_LeftToRight_CalculatesCorrectly(string expr, double expected)
     {
         double actual = EvaluateExpression(expr);
         Assert.Equal(expected, actual);
     }
 
-    // некорректный ввод
+    // ---------- некорректный ввод ----------
     [Fact]
     public void EvaluateExpression_InvalidFormat_Throws()
         => Assert.Throws<FormatException>(() => EvaluateExpression("2 +"));
