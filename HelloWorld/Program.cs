@@ -1,2 +1,17 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿// Program.cs (top‑level statements)
+using System;
+
+Console.WriteLine("Введите выражение: ");
+string? line = Console.ReadLine();
+
+try
+{
+    double result = Calculator.EvaluateExpression(line);
+    Console.WriteLine($"Результат: {line} = {result}");
+}
+catch (Exception ex)
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine($"Ошибка: {ex.Message}");
+    Console.ResetColor();
+}
