@@ -54,5 +54,8 @@ class Program
         {
             Console.WriteLine($"{acc.Number} – {acc.Owner} – {acc.Balance:C2}");
         }
+
+        //Сохранение в CSV
+        service.ExportStatementToCsv();
     }
 }

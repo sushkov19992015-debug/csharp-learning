@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Bank.Models;
 
 namespace Bank.Services;
@@ -12,12 +13,12 @@ public class BankService
     private readonly List<Account> _accounts = new();
 
     // ----- CRUD для счетов -----
-    public Account OpenAccount(string number, Customer owner, double initialBalance = 0)
+    public Account OpenAccount(string number, Customer owner, double initialBalance = 0, double interestRate = 0)
     {
         if (_accounts.Any(a => a.Number == number))
             throw new ArgumentException($"Счёт с номером {number} уже существует.");
 
-        var acc = new Account(number, owner, initialBalance);
+        var acc = new Account(number, owner, initialBalance, interestRate);
         _accounts.Add(acc);
         return acc;
     }
@@ -75,5 +76,31 @@ public class BankService
     {
         var acc = GetAccount(accountNumber);
         acc.Withdraw(amount, note);
+    }
+
+    //Начисление процентов
+    public void ApplyInterestToAll(double InterestRate, int months)
+    {
+        var service = new BankService();
+
+        foreach (var acc in _accounts)
+        {
+            acc.ApplyInterest(InterestRate, months);
+        }
+    }
+
+    // Выгрузка в CSV
+    public string ExportStatementToCsv()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("Date,Amount,Type,Note");          // заголовок
+        foreach (var acc in _accounts)
+        {
+            foreach (var tr in acc.Transactions)
+            {
+                sb.AppendLine($"{tr.Date:O},{tr.Amount},{tr.Type},{tr.Note}");
+            }
+        }
+        return sb.ToString();
     }
 }

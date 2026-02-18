@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using Bank.Models;
 using Bank.Services;
 using Xunit;
@@ -79,5 +80,33 @@ public class BankServiceTests
         // Проверяем, что массив отсортирован по возрастанию
         for (int i = 0; i < balances.Count - 1; i++)
             Assert.True(balances[i] <= balances[i + 1]);
+    }
+
+    [Fact]
+    public void Account_ApplyInterest_IncreasesBalanceCorrectly()
+    {
+        // Arrange
+        var account = new Account("RU001", _alice, 1000) { InterestRate = 0.12 };
+        int months = 6;
+        double expectedBalance = 1061.52;
+
+        // Act
+        account.ApplyInterest(account.InterestRate, months);
+
+        // Assert
+        Assert.Equal(expectedBalance, account.Balance, precision: 2); // Проверяем с точностью до 2 знаков
+    }
+
+    [Fact]
+    public void Transaction_TypeIsSetCorrectly()
+    {
+        // Arrange
+        _service.Deposit("RU001", 200);
+        var acc = _service.GetAccount("RU001");
+        Assert.Equal(1200, acc.Balance);
+    
+        // When
+    
+        // Then
     }
 }
