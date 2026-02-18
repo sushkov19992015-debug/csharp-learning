@@ -44,5 +44,15 @@ class Program
         Console.WriteLine(found != null
             ? $"\nСчёт найден бинарным поиском: {found.Number}, баланс {found.Balance:C2}"
             : "\nСчёт не найден бинарным поиском");
+
+        // Начисление процентов
+        Console.WriteLine("\n>>> Начисление процентов:");
+        service.ApplyInterestToAll(0.05, 6); // 5% годовых на 6 месяцев
+        
+        Console.WriteLine("\n>>> Итоговые балансы:");
+        foreach (var acc in service.GetAllAccounts())
+        {
+            Console.WriteLine($"{acc.Number} – {acc.Owner} – {acc.Balance:C2}");
+        }
     }
 }

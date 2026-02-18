@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime;
 using System.Text;
 
 namespace Bank.Models;
@@ -10,6 +11,7 @@ namespace Bank.Models;
 public class Account
 {
     // ---------- свойства ----------
+    public double InterestRate { get; init; }
     public Guid   Id      { get; } = Guid.NewGuid();
     public string Number  { get; init; }          // например "RU00123456789"
     public Customer Owner { get; init; }
@@ -20,10 +22,20 @@ public class Account
     public double Balance { get; private set; }
 
     // ---------- конструктор ----------
-    public Account(string number, Customer owner, double initialBalance = 0)
+    public void ApplyInterest(double InterestRate, int months = 0)
+    {
+        Balance *= Math.Pow(1 + InterestRate/12, months);
+
+        var amount = Balance % Math.Pow(1 + InterestRate/12, months);
+        var note = "Interest";
+
+        _transactions.Add(new Transaction(DateTime.UtcNow, amount, TransactionType.Interest, note));
+    }
+    public Account(string number, Customer owner, double initialBalance = 0, double interestRate = 0)
     {
         Number = number ?? throw new ArgumentNullException(nameof(number));
         Owner  = owner  ?? throw new ArgumentNullException(nameof(owner));
+        InterestRate = interestRate;
 
         if (initialBalance != 0)
         {
@@ -41,7 +53,7 @@ public class Account
             throw new ArgumentException("Сумма должна быть > 0", nameof(amount));
 
         Balance += amount;
-        _transactions.Add(new Transaction(DateTime.UtcNow, amount, note));
+        _transactions.Add(new Transaction(DateTime.UtcNow, amount, TransactionType.Deposit, note));
     }
 
     /// <summary>
@@ -56,7 +68,7 @@ public class Account
             throw new InvalidOperationException("Недостаточно средств");
 
         Balance -= amount;
-        _transactions.Add(new Transaction(DateTime.UtcNow, -amount, note));
+        _transactions.Add(new Transaction(DateTime.UtcNow, -amount, TransactionType.Withdrawal, note));
     }
 
     // ---------- выписка ----------
@@ -73,7 +85,7 @@ public class Account
         sb.AppendLine();
 
         // таблица транзакций
-        sb.AppendLine("Дата                |      Сумма      | Примечание");
+        sb.AppendLine("Дата                |      Сумма      | Примечание | Тип транзакции ");
         sb.AppendLine(new string('-', 50));
 
         foreach (var tr in _transactions)
